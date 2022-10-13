@@ -59,17 +59,25 @@ setup_compose() {
 
     cd $REDASH_BASE_PATH
     GIT_BRANCH="${REDASH_BRANCH:-master}" # Default branch/version to master if not specified in REDASH_BRANCH env var
-    wget https://raw.githubusercontent.com/getredash/setup/${GIT_BRANCH}/data/docker-compose.yml
+    # wget https://raw.githubusercontent.com/getredash/setup/${GIT_BRANCH}/data/docker-compose.yml
+    # 从git上下载docker-compose 修改为 获取该项目自身的docker-compose
+    sudo /bin/cp -rf ./data/docker-compose.yml $REDASH_BASE_PATH/docker-compose.yml
     sed -ri "s/image: redash\/redash:([A-Za-z0-9.-]*)/image: redash\/redash:$LATEST_VERSION/" docker-compose.yml
     echo "export COMPOSE_PROJECT_NAME=redash" >> ~/.profile
-    echo "export COMPOSE_FILE=/opt/redash/docker-compose.yml" >> ~/.profile
+    echo "export COMPOSE_FILE=${REDASH_BASE_PATH}/docker-compose.yml" >> ~/.profile
     export COMPOSE_PROJECT_NAME=redash
-    export COMPOSE_FILE=/opt/redash/docker-compose.yml
+    export COMPOSE_FILE=${REDASH_BASE_PATH}/docker-compose.yml
+    # 初始化redis 和 postgres 数据库
     sudo docker-compose run --rm server create_db
+    # 启动容器
     sudo docker-compose up -d
 }
 
+# 安装docker 和 docker-compose
 install_docker
+# 创建和授权数据目录
 create_directories
+# 创建配置文件
 create_config
+# 实际启动 docker 容器和初始化数据库
 setup_compose
