@@ -7,6 +7,8 @@
 
 一般在读写权限的目录复制下面的脚本到控制台执行即可；如果想修改其中docker-compose 的配置，直接clone 之后修改就可以了
 
+如果不修改默认安装数据的路径，则需要授权读写 `/opt/redash` 这个路径 
+
 ```shell script
 echo "下载执行脚本和docker-compose配置文件"
 git clone https://github.com/KANLON/setup.git 
