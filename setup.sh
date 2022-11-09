@@ -54,14 +54,15 @@ create_config() {
 }
 
 setup_compose() {
+    # wget https://raw.githubusercontent.com/getredash/setup/${GIT_BRANCH}/data/docker-compose.yml
+    # 从git上下载docker-compose 修改为 获取该项目自身的docker-compose
+    sudo /bin/cp -rf data/docker-compose.yml $REDASH_BASE_PATH/docker-compose.yml
+    
     REQUESTED_CHANNEL=stable
     LATEST_VERSION=`curl -s "https://version.redash.io/api/releases?channel=$REQUESTED_CHANNEL"  | json_pp  | grep "docker_image" | head -n 1 | awk 'BEGIN{FS=":"}{print $3}' | awk 'BEGIN{FS="\""}{print $1}'`
 
     cd $REDASH_BASE_PATH
     GIT_BRANCH="${REDASH_BRANCH:-master}" # Default branch/version to master if not specified in REDASH_BRANCH env var
-    # wget https://raw.githubusercontent.com/getredash/setup/${GIT_BRANCH}/data/docker-compose.yml
-    # 从git上下载docker-compose 修改为 获取该项目自身的docker-compose
-    sudo /bin/cp -rf ../data/docker-compose.yml $REDASH_BASE_PATH/docker-compose.yml
     sed -ri "s/image: redash\/redash:([A-Za-z0-9.-]*)/image: redash\/redash:$LATEST_VERSION/" docker-compose.yml
     echo "export COMPOSE_PROJECT_NAME=redash" >> ~/.profile
     echo "export COMPOSE_FILE=${REDASH_BASE_PATH}/docker-compose.yml" >> ~/.profile
